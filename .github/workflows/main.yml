@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-riscv64-linux-gnu build-essential bc bison flex \
-            cpio kmod rsync libssl-dev libelf-dev dpkg-dev debhelper python3
+            cpio kmod rsync libssl-dev libelf-dev libdw-dev dpkg-dev debhelper python3
 
       - name: Configure
         run: |
@@ -27,7 +27,9 @@ jobs:
           make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- olddefconfig
 
       - name: Build deb packages
-        run: make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc) bindeb-pkg
+        env:
+          DEB_BUILD_PROFILES: pkg.linux-upstream.nokernelheaders
+        run: make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc) bindeb-pkg DPKG_FLAGS=-d
 
       - name: Collect
         run: |
